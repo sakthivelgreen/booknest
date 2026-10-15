@@ -1,9 +1,12 @@
-Difference between Gradle and Maven
+## Gradle vs Maven
 
-1. Found that Gradle is built upon Ant 
-2. Maven uses XML , Gradle uses Json like format
-3. Maven uses Target folder for output , Gradle uses build folder
-4. Maven can handle multi-module dependencies , gradle uses also uses the almost like the same but dependencies are declared in build.gradle
-5. maven uses pom.xml , gradle uses two different types of files settings.gradle and build.gradle
-6. both can have tasks , only the syntax differs functionality same
-7. Gradle uses plugins in build file to include libraries 
+1. Config: Maven = XML (pom.xml). Gradle = Groovy/Kotlin DSL (build.gradle / build.gradle.kts) — real code, not JSON.
+2. Multi-module: Maven lists <modules> in the parent POM. Gradle lists modules in settings.gradle; each module has its own build.gradle.
+3. Model: Maven = fixed lifecycle (phases) + plugin goals. Gradle = graph of tasks; custom tasks are easy.
+4. Plugins add capabilities (java, war); libraries come from dependencies {} + repositories {} — same split in Maven.
+5. Scopes: compile→implementation/api, provided→compileOnly/providedCompile, runtime→runtimeOnly, test→testImplementation.
+6. Versions: Maven dependencyManagement ≈ Gradle platform() BOMs / version catalog.
+7. Output: Maven target/, Gradle build/.
+8. Speed: Gradle has incremental builds, build cache and daemon.
+9. Gradle was inspired by Ant and Maven, but is not built on Ant (it can run Ant tasks).
+10. Use the wrapper: ./gradlew (and ./mvnw) so everyone runs the same version.
