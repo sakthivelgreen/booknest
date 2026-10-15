@@ -6,3 +6,4 @@
  */
 
 rootProject.name = 'booknest'
+include('booknest-api','booknest-core','booknest-web')

@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":booknest-core")
+    compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
+}
