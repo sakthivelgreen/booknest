@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ivy-module version="2.0">
+    <info organisation="com.booknest" module="booknest-core" revision="1.0.0"/>
+
+    <configurations>
+        <conf name="compile" description="Needed to compile and run main code"/>
+        <conf name="test" extends="compile" description="Needed only for tests"/>
+    </configurations>
+
+    <dependencies>
+        <!-- Later phases add compile deps here, e.g. Hibernate:
+        <dependency org="org.hibernate.orm" name="hibernate-core" rev="6.6.4.Final" conf="compile->default"/> -->
+        <dependency org="org.junit.jupiter" name="junit-jupiter" rev="5.11.4" conf="test->default"/>
+        <dependency org="org.junit.platform" name="junit-platform-launcher" rev="1.11.4" conf="test->default"/>
+        <dependency org="org.junit.platform" name="junit-platform-console" rev="1.11.4" conf="test->default"/>
+    </dependencies>
+</ivy-module>

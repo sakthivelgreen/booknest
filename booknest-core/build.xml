@@ -1,0 +1,93 @@
+<project name="booknest-core" default="jar" basedir="."
+         xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <!-- ===== Properties ===== -->
+    <property name="version"          value="1.0.0"/>
+    <property name="src.dir"          value="src/main/java"/>
+    <property name="test.src.dir"     value="src/test/java"/>
+    <property name="lib.dir"          value="lib"/>
+    <property name="build.dir"        value="build"/>
+    <property name="classes.dir"      value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/>
+    <property name="reports.dir"      value="${build.dir}/test-reports"/>
+    <property name="dist.dir"         value="${build.dir}/dist"/>
+    <property name="jar.file"         value="${dist.dir}/booknest-core-${version}.jar"/>
+
+    <property name="ivy.version"      value="2.5.2"/>
+    <property name="ivy.jar.dir"      value="${user.home}/.ant/lib"/>
+    <property name="ivy.jar"          value="${ivy.jar.dir}/ivy-${ivy.version}.jar"/>
+
+    <!-- ===== Ivy bootstrap: download Ivy once, then load its tasks ===== -->
+    <target name="ivy-download" unless="ivy.present">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"
+             dest="${ivy.jar}" skipexisting="true"/>
+    </target>
+
+    <target name="ivy-init">
+        <available file="${ivy.jar}" property="ivy.present"/>
+        <antcall target="ivy-download"/>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar}"/>
+    </target>
+
+    <!-- ===== Resolve: Ivy downloads jars into lib/compile and lib/test ===== -->
+    <target name="resolve" depends="ivy-init" description="Download dependencies with Ivy">
+        <ivy:retrieve pattern="${lib.dir}/[conf]/[artifact]-[revision].[ext]" sync="true" type="jar,bundle"/>
+    </target>
+
+    <!-- ===== Classpaths ===== -->
+    <target name="paths" depends="resolve">
+        <mkdir dir="${lib.dir}/compile"/>
+        <path id="compile.classpath">
+            <fileset dir="${lib.dir}/compile" includes="*.jar"/>
+        </path>
+        <path id="test.classpath">
+            <pathelement location="${classes.dir}"/>
+            <pathelement location="${test.classes.dir}"/>
+            <fileset dir="${lib.dir}/test" includes="*.jar"/>
+        </path>
+    </target>
+
+    <!-- ===== Build targets ===== -->
+    <target name="clean" description="Delete build output and downloaded libs">
+        <delete dir="${build.dir}"/>
+        <delete dir="${lib.dir}"/>
+    </target>
+
+    <target name="compile" depends="paths" description="Compile main code">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" release="21"
+               includeantruntime="false" classpathref="compile.classpath"/>
+    </target>
+
+    <target name="compile-tests" depends="compile">
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" release="21"
+               includeantruntime="false" classpathref="test.classpath"/>
+    </target>
+
+    <target name="test" depends="compile-tests" description="Run JUnit 5 tests">
+        <java classname="org.junit.platform.console.ConsoleLauncher" fork="true" failonerror="true">
+            <classpath refid="test.classpath"/>
+            <arg value="execute"/>
+            <arg value="--scan-classpath"/>
+            <arg value="${test.classes.dir}"/>
+            <arg value="--details"/>
+            <arg value="tree"/>
+            <arg value="--disable-banner"/>
+            <arg value="--disable-ansi-colors"/>
+        </java>
+    </target>
+
+    <target name="jar" depends="test" description="Package booknest-core jar (only after tests pass)">
+        <mkdir dir="${dist.dir}"/>
+        <jar destfile="${jar.file}" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Implementation-Title" value="booknest-core"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+            </manifest>
+        </jar>
+        <echo message="Built ${jar.file}"/>
+    </target>
+</project>
